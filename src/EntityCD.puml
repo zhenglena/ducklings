@@ -1,0 +1,120 @@
+@startuml
+class Classroom {
+-id : Long
+-name : String
+-ageGroup : AgeGroupEnum
+-children : List<Child> @OneToMany
+}
+
+class User {
+-id : Long
+-name : String
+-username : String
+-password : String
+-authority : List<Authority>
+}
+
+class Authority implements GrantedAuthority {
+-id : Long
+-authority : String
+-user : User
+
++getAuthority() @Override
+}
+
+class Child {
+-id : Long
+-name : String
+-dateOfBirth : LocalDate
+-classroom : Classroom @ManyToOne
+-familyUsers : List<User> @ManyToMany
+-dailyLog : List<DailyLog> @OneToMany
+}
+
+class DailyLog {
+-id : Long
+-date : LocalDate
+-child : Child @ManyToOne
+-activityLog : List<ActivityLog> @OneToMany
+}
+
+abstract class ActivityLog {
+-id : Long
+-dailyLog : DailyLog @ManyToOne
+-startTime : LocalTime
+-notes : String
+}
+
+class FoodLog {
+-amount : FoodAmountEnum
+}
+
+class NapLog {
+-endTime : LocalTime
+}
+
+class BathroomLog {
+-contents : List<BathroomContentEnum>
+}
+
+class BottleLog {
+-totalOunces : Float
+-ouncesDrank : Float
+-contents : List<BottleContentEnum>
+}
+
+class DiaperLog {
+-contents : List<DiaperContentEnum>
+-appliedCream : Boolean
+}
+
+enum DiaperContentEnum {
+WET
+BM
+DRY
+}
+
+enum AgeGroupEnum {
+INFANT
+TODDLER
+PRESCHOOL
+}
+
+enum BottleContentEnum {
+BREAST_MILK
+FORMULA
+WHOLE_MILK
+}
+
+enum BathroomContentEnum {
+PEE
+BM
+ATTEMPTED
+}
+
+enum FoodAmountEnum {
+ALL
+MOST
+SOME
+NONE
+}
+
+
+User -- Child
+Authority -- Child
+Classroom "1" -- "0..*" Child : contains
+Classroom -- AgeGroupEnum
+Child "1" *-- "0..*" DailyLog
+DailyLog "1" *-- "0..*" ActivityLog
+ActivityLog --|> FoodLog
+ActivityLog --|> NapLog
+ActivityLog --|> DiaperLog
+ActivityLog --|> BottleLog
+ActivityLog --|> BathroomLog
+FoodLog -- FoodAmountEnum
+BathroomLog -- BathroomContentEnum
+BottleLog -- BottleContentEnum
+DiaperLog -- DiaperContentEnum
+
+note right of Authority : ROLE_ADMIN, ROLE_CLASSROOM, ROLE_FAMILY
+@enduml
