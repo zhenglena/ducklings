@@ -1,0 +1,21 @@
+services:
+  pgdb:
+    image: postgres:16
+    container_name: pg_server
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER: docker
+      - POSTGRES_PASSWORD: docker
+      - POSTGRES_DB: daycare_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - db-network
+    restart: always
+
+volumes:
+  pgdata:
+
+networks:
+  db-network:
