@@ -34,22 +34,22 @@
 
 ### Classrooms
 - GET: getAllClassrooms (/api/classroom) (admin only)
-- GET: getChildrenByClassroomId (/api/classroom/{classroomId}/children)
+- GET: getChildrenByClassroomId (/api/classroom/{classroomId})
 - POST: createClassroom (/api/classroom) (admin only)
 - PUT: updateClassroomById (/api/classroom/{classroomId}) (admin only)
 
 ### Users
-- GET: getChildrenByUserId (/api/users/{userId}/children)
+- GET: getChildrenByUserId (/api/users/{userId})
 - POST: createUser (/api/users) (admin only)
 - PUT: updateUser (/api/users/{userId}) (admin only)
 
 ### Daily Logs
-- GET: getChildDailyLogsById (/api/children/{childId}/daily-logs)
-- GET: getChildDailyLogById (/api/children/{childId}/daily-logs/{dailyLogId})
-- POST: createChildDailyLog (/api/children/{childId}/daily-logs)
+- GET: getDailyLogsById (/api/children/{childId}/daily-logs)
+- GET: getDailyLogById (/api/children/{childId}/daily-logs/{dailyLogId})
+- POST: createDailyLog (/api/children/{childId}/daily-logs)
 
 ### Activity Logs
-- POST: createActivityLog (/api/daily-logs/{dailyLogId}/activity) 
+- POST: createActivityLog (/api/daily-logs/) 
 - PUT: updateActivityLogById (/api/daily-logs/{dailyLogId}/activity/{logId})
 - DELETE: deleteActivityLogById (/api/daily-logs/{dailyLogId}/activity/{logId})
 
@@ -81,6 +81,7 @@
 - classroom : Classroom @ManyToOne
 - familyUsers : List\<User> @ManyToMany
 - dailyLog : List\<DailyLog> @OneToMany
+- notes : String
 
 ### DailyLog
 - id : Long
@@ -120,22 +121,27 @@
     - username : varchar
     - password : varchar
 
-### classrooms
-    - id : number (pk)
-    - name : varchar
-    - ageGroup : varchar
-    - username : varchar (fk) // classroom username
-
-### authorities
-    - id : number (pk)
-    - authority : varchar
-    - user_id : number (fk)
-
 ### children
     - id : number (pk)
     - name : varchar
     - dateOfBirth : date
     - classroom_id : number (fk)
+    - notes : varchar
+
+### user_children (joint table)
+    - user_id : number (fk)
+    - child_id : number (fk)
+
+### classrooms
+    - id : number (pk)
+    - name : varchar
+    - ageGroup : varchar
+    - user_id : number (fk) // classroom username
+
+### authorities
+    - id : number (pk)
+    - authority : varchar
+    - user_id : number (fk)
 
 ### daily_logs
     - id : number (pk)

@@ -1,0 +1,336 @@
+openapi: "3.0.2"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: https://api.server.test/v1
+
+tags:
+  - name: Children
+    description: Manage child records and details
+  - name: Classrooms
+    description: Manage classroom information
+  - name: Users
+    description: Manage users and guardians
+  - name: Daily Logs
+    description: Track daily logs for children
+  - name: Activity Logs
+    description: Food, Sleep, Bathroom, Diaper, Bottle logs for each day
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          type: number
+        name:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+          description: encrypted
+
+    Child:
+      type: object
+      properties:
+        child_id:
+          type: number
+        name:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        notes:
+          type: string
+        classroom:
+          $ref: '#/components/schemas/Classroom'
+
+    Classroom:
+      type: object
+      properties:
+        classroom_id:
+          type: number
+        name:
+          type: string
+        ageGroup:
+          type: string
+          enum: [INFANT, TODDLER, PRESCHOOL]
+        classroomUser:
+          $ref: '#/components/schemas/User'
+
+    DailyLog:
+      type: object
+      properties:
+        daily_log_id:
+          type: number
+        date:
+          type: string
+          format: date
+        child_id:
+          type: number
+        activity_logs:
+          type: array
+          description: "IDs of activities added to the log"
+          items:
+            type: number
+
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/children:
+    post:
+      operationId: "createChild"
+      tags:
+        - Children
+      summary: "Create a child."
+      responses:
+        '200':
+          description: OK
+  /api/children/{childId}:
+    get:
+      operationId: "getChildById"
+      tags:
+        - Children
+      summary: "Get a child by their ID."
+      parameters:
+        - name: id
+          in: path
+          description: Child ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+
+    put:
+      operationId: "updateChildById"
+      tags:
+        - Children
+      summary: "Update a child by their ID."
+      parameters:
+        - name: id
+          in: path
+          description: Child ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+
+  /api/children/{childId}/daily-logs:
+    get:
+      operationId: "getDailyLogsById"
+      tags:
+        - Daily Logs
+      summary: "Get all of the child's daily logs."
+      parameters:
+        - name: id
+          in: path
+          description: Child ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+    post:
+      operationId: "createDailyLog"
+      tags:
+        - Daily Logs
+      summary: "Create a child's daily log."
+      parameters:
+        - name: id
+          in: path
+          description: Child ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+  /api/children/{childId}/daily-logs/{dailyLogId}:
+    get:
+      operationId: "getDailyLogById"
+      tags:
+        - Daily Logs
+      summary: "Get a child's daily log."
+      parameters:
+        - name: childId
+          in: path
+          description: Child ID
+          required: true
+          schema:
+            type: number
+        - name: dailyLogId
+          in: path
+          description: Daily log ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+
+  /api/classroom:
+    get:
+      operationId: "getAllClassrooms"
+      tags:
+        - Classrooms
+      summary: "Get all classrooms."
+      responses:
+        '200':
+          description: OK
+
+    post:
+      operationId: "createClassroom"
+      tags:
+        - Classrooms
+      summary: "Create a classroom."
+      responses:
+        '200':
+          description: OK
+
+  /api/classroom/{classroomId}:
+    get:
+      operationId: "getChildrenByClassroomId"
+      tags:
+        - Classrooms
+      summary: "Get all the children in a classroom."
+      parameters:
+        - name: classroomId
+          in: path
+          description: Classroom ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+    put:
+      operationId: "updateClassroomById"
+      tags:
+        - Classrooms
+      summary: "Update a classroom by their ID."
+      parameters:
+        - name: classroomId
+          in: path
+          description: Classroom ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+
+  /api/users:
+    post:
+      operationId: "createUser"
+      tags:
+        - Users
+      summary: "Create a User."
+      description: "Admin only function."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: OK
+  /api/users/{userId}:
+    get:
+      operationId: "getChildrenByUserId"
+      tags:
+        - Users
+      summary: "Get all the children registered under a User"
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+    put:
+      operationId: "updateUser"
+      tags:
+        - Users
+      summary: "Update a User's information."
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+
+  /api/daily-logs:
+    get:
+      operationId: "createActivityLog"
+      tags:
+        - Activity Logs
+      summary: "Create an activity log for a child"
+      responses:
+        '200':
+          description: OK
+  /api/daily-logs/{dailyLogId}/activity/{logId}:
+    put:
+      operationId: "updateActivityLogById"
+      tags:
+        - Activity Logs
+      summary: "Update an Activity Log"
+      parameters:
+        - name: dailyLogId
+          in: path
+          description: Daily Log ID
+          required: true
+          schema:
+            type: number
+        - name: logId
+          in: path
+          description: Activity Log ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
+    delete:
+      operationId: "deleteActivityLogById"
+      tags:
+        - Activity Logs
+      summary: "Delete an Activity Log"
+      parameters:
+        - name: dailyLogId
+          in: path
+          description: Daily Log ID
+          required: true
+          schema:
+            type: number
+        - name: logId
+          in: path
+          description: Activity Log ID
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
